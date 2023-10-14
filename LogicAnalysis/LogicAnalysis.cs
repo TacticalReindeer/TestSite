@@ -1,0 +1,164 @@
+using System;
+using System.Collections.Generic;
+
+public class Program
+{
+    enum Logic
+    {
+        and, or, xor
+    }
+    static void Main(string[] args)
+    {
+        Console.WriteLine("\nlogicAnalysis:");
+
+        string input = "";
+
+        for (; ; )
+        {
+            string str = Console.ReadLine();
+            if (str == null) break;
+            input += str;
+        }
+
+        List<string> vars = new List<string>();
+        List<int> varPositions = new List<int>();
+
+        Console.CursorTop++;
+
+        // print header row
+        {
+            string[] labels;
+            labels = input.Split(new[] { ' ', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+            int count = -1;
+            while (count + 1 != labels.Length)
+            {
+                switch (labels[++count])
+                {
+                    case "(":
+                    case ")":
+                    case "or":
+                    case "and":
+                    case "not":
+                    case "xor":
+                        break;
+                    default:
+                        Console.Write(" " + labels[count]);
+                        vars.Add(labels[count]);
+                        varPositions.Add(Console.CursorLeft - 1);
+                        break;
+                }
+            }
+
+            varPositions.Add(Console.CursorLeft + 2);
+            Console.WriteLine("  Q\n");
+        }
+
+        // print content
+        int max = (int)Math.Pow(2, vars.Count);
+        for (int i = 0; i < max; i++)
+        {
+            string binary = ToBinary(i);
+            int binaryPos = 0;
+
+            Console.WriteLine(GetResult(input) ? "1" : "0");
+
+            bool GetResult(string arg)
+            {
+                string[] labels = arg.Split(new[] { ' ', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+                int readPos = -1, packLayer = 0, pack = "";
+                bool result = false, not = false, isPacking = false;
+                Logic logic = Logic.or;
+
+                while (++readPos != labels.Length)
+                    switch (labels[readPos])
+                    {
+                        case "(":
+                            if (isPacking) pack += " " + labels[readPos];
+                            else isPacking = true;
+                            packLayer++;
+                            break;
+                        case ")":
+                            if (isPacking && packLayer > 1)
+                            {
+                                pack += " " + labels[readPos];
+                                break;
+                            }
+                            else if (packLayer < 1) Console.WriteLine("Error: bracket ) not matched!");
+                            isPacking = false;
+                            packLayer--;
+
+                            LogicGate(GetResult(pack) ^ not);
+
+                            pack = "";
+                            not = false;
+                            break;
+                        case "and":
+                            if (isPacking) pack += " " + labels[readPos];
+                            else logic = Logic.and;
+                            break;
+                        case "or":
+                            if (isPacking) pack += " " + labels[readPos];
+                            else logic = Logic.or;
+                            break;
+                        case "xor":
+                            if (isPacking) pack += " " + labels[readPos];
+                            else logic = Logic.xor;
+                            break;
+                        case "not":
+                            if (isPacking) pack += " " + labels[readPos];
+                            else not = true;
+                            break;
+
+                        default:
+                            if (isPacking)
+                            {
+                                pack += " " + labels[readPos];
+                                break;
+                            }
+                            char var = binary[(binary.Length - vars.Count) + binaryPos];
+                            Console.CursorLeft = varPositions[binaryPos];
+                            Console.Write(var.ToString());
+
+                            LogicGate((var == '1') ^ not);
+
+                            not = false;
+                            binaryPos++;
+                            break;
+                    }
+                if (packLayer != 0) Console.WriteLine("Error: bracket ( not matched!");
+
+                Console.CursorLeft = varPositions[varPositions.Count - 1];
+                return result;
+
+                void LogicGate(bool input)
+                {
+                    switch (logic)
+                    {
+                        case Logic.and:
+                            result &= input;
+                            break;
+                        case Logic.or:
+                            result |= input;
+                            break;
+                        case Logic.xor:
+                            result ^= input;
+                            break;
+                    }
+                }
+            }
+            string ToBinary(int x)
+            {
+                char[] buff = new char[32];
+
+                for (int i = 31; i >= 0; i--)
+                {
+                    int mask = 1 << i;
+                    buff[31 - i] = (x & mask) != 0 ? '1' : '0';
+                }
+
+                return new string(buff);
+            }
+        }
+    }
+}
