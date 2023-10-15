@@ -20,7 +20,7 @@ public class Program
             input += str;
         }
 
-        List<string> vars = new List<string>();
+        List<string> variables = new List<string>();
         List<int> varPositions = new List<int>();
 
         Console.CursorTop++;
@@ -29,10 +29,10 @@ public class Program
         {
             string[] labels;
             labels = input.Split(new[] { ' ', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
-            int count = -1;
-            while (count + 1 != labels.Length)
+
+            for (int readPos = 0; readPos + 1 != labels.Length; readPos++)
             {
-                switch (labels[++count])
+                switch (labels[++readPos])
                 {
                     case "(":
                     case ")":
@@ -42,8 +42,8 @@ public class Program
                     case "xor":
                         break;
                     default:
-                        Console.Write(" " + labels[count]);
-                        vars.Add(labels[count]);
+                        Console.Write(" " + labels[readPos]);
+                        variables.Add(labels[readPos]);
                         varPositions.Add(Console.CursorLeft - 1);
                         break;
                 }
@@ -53,24 +53,36 @@ public class Program
             Console.WriteLine("  Q\n");
         }
 
-        // print content
-        int max = (int)Math.Pow(2, vars.Count);
-        for (int i = 0; i < max; i++)
+        // print truth table
+        for (int i = 0, max = (int)Math.Pow(2, variables.Count); i < max; i++)
         {
             string binary = ToBinary(i);
             int binaryPos = 0;
 
             Console.WriteLine(GetResult(input) ? "1" : "0");
 
+            string ToBinary(int x)
+            {
+                char[] buff = new char[32];
+
+                for (int i = 31; i >= 0; i--)
+                {
+                    int mask = 1 << i;
+                    buff[31 - i] = (x & mask) != 0 ? '1' : '0';
+                }
+
+                return new string(buff);
+            }
             bool GetResult(string arg)
             {
                 string[] labels = arg.Split(new[] { ' ', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
 
-                int readPos = -1, packLayer = 0, pack = "";
+                int packLayer = 0;
+                string pack = "";
                 bool result = false, not = false, isPacking = false;
                 Logic logic = Logic.or;
 
-                while (++readPos != labels.Length)
+                for (int readPos = 0; readPos != labels.Length; readPos++)
                     switch (labels[readPos])
                     {
                         case "(":
@@ -93,6 +105,7 @@ public class Program
                             pack = "";
                             not = false;
                             break;
+
                         case "and":
                             if (isPacking) pack += " " + labels[readPos];
                             else logic = Logic.and;
@@ -116,11 +129,11 @@ public class Program
                                 pack += " " + labels[readPos];
                                 break;
                             }
-                            char var = binary[(binary.Length - vars.Count) + binaryPos];
+                            char bin = binary[(binary.Length - variables.Count) + binaryPos];
                             Console.CursorLeft = varPositions[binaryPos];
-                            Console.Write(var.ToString());
+                            Console.Write(bin.ToString());
 
-                            LogicGate((var == '1') ^ not);
+                            LogicGate((bin == '1') ^ not);
 
                             not = false;
                             binaryPos++;
@@ -146,18 +159,6 @@ public class Program
                             break;
                     }
                 }
-            }
-            string ToBinary(int x)
-            {
-                char[] buff = new char[32];
-
-                for (int i = 31; i >= 0; i--)
-                {
-                    int mask = 1 << i;
-                    buff[31 - i] = (x & mask) != 0 ? '1' : '0';
-                }
-
-                return new string(buff);
             }
         }
     }
