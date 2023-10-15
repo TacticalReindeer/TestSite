@@ -30,9 +30,9 @@ public class Program
             string[] labels;
             labels = input.Split(new[] { ' ', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
 
-            for (int readPos = 0; readPos + 1 != labels.Length; readPos++)
+            for (int readPos = 0; readPos != labels.Length; readPos++)
             {
-                switch (labels[++readPos])
+                switch (labels[readPos])
                 {
                     case "(":
                     case ")":
@@ -161,5 +161,7 @@ public class Program
                 }
             }
         }
+
+        Main(null);
     }
 }
