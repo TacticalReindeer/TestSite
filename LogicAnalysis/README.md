@@ -1,5 +1,5 @@
 ﻿## LogicAnalysis
-Generate truth table of a boolean expression
+Generate truth table of a boolean expression\n
 execute on cmd
 
 - input boolean expression, separate labels with " " or "\n"
