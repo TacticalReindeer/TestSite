@@ -1,0 +1,5 @@
+bad 10
+acceptable 20
+common 40
+excellent 10
+ultimate 5
