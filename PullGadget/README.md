@@ -1,11 +1,9 @@
 ﻿## PullGadget
-Read text data and generate random results
+Read text file and generate random results
 - execute this program in cmd,
 - C:\\> PullGadget [/repeat [number]] [inputTextFiles]
-> -  repeat: /repeat [number] (optional)
->to generate 10 results: "/repeat 10"
-> - accept several .txt file: "rarity quality"
-> (dont follow with .txt)
+> -  repeat: /repeat [number] (optional), to generate 10 results: "/repeat 10"
+> - accept several .txt file: "rarity quality" (dont follow with .txt)
 
 Text file to read
 - [itemName] [proportion]
